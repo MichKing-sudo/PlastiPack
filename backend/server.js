@@ -432,7 +432,7 @@ app.post('/api/ordenes/:id/reportes', async (req, res) => {
         const linea = pedido.lineas.id(orden.lineaPedidoId)
         if (linea) {
           const proceso = getOrderProcess(orden.procesos)
-          const sequence = getProcessSequence(orden.referencia.procesos || {})
+          const sequence = getProcessSequence(orden.procesos)
           const currentIndex = sequence.indexOf(proceso)
           const totalCantidad = linea.cantidad || 0
 

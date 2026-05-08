@@ -64,6 +64,7 @@ export default function Dashboard() {
   const [reportData, setReportData] = useState([])
   const [reportLoading, setReportLoading] = useState(false)
   const [reportError, setReportError] = useState('')
+  const [reportSearched, setReportSearched] = useState(false)
 
   const loadDashboard = async () => {
     setLoading(true)
@@ -86,11 +87,13 @@ export default function Dashboard() {
   const loadReport = async () => {
     setReportError('')
     setReportLoading(true)
+    setReportSearched(true)
     try {
       const { data } = await axios.get('/api/reportes/turno', { params: { fecha: reportDate } })
       setReportData(data)
     } catch (err) {
       setReportError('No se pudo generar el reporte.')
+      setReportData([])
     } finally {
       setReportLoading(false)
     }
@@ -246,8 +249,8 @@ export default function Dashboard() {
 
   if (usuario?.rol === 'operario') {
     const misOrdenes = ordenes.filter(o =>
-      o.reportes?.some(r => r.operario === usuario._id) ||
-      o.creadoPor === usuario._id
+      o.reportes?.some(r => r.operario?._id === usuario._id) ||
+      o.creadoPor?._id === usuario._id
     )
     return (
       <div>
@@ -571,22 +574,34 @@ export default function Dashboard() {
             </button>
           </div>
           {reportError && <div className="error-msg"><span>⚠</span> {reportError}</div>}
-          {reportData.length > 0 ? (
-            <div className="report-list">
-              {reportData.map((item, idx) => (
-                <div key={`${item.referencia}-${idx}`} className="report-card">
-                  <div className="report-card-title">{item.referencia || 'Sin referencia'}</div>
-                  <div className="report-card-row"><span>Operario</span><strong>{item.operario || 'Desconocido'}</strong></div>
-                  <div className="report-card-row"><span>Cantidad producida</span><strong>{item.cantidadProducida || 0}</strong></div>
-                  <div className="report-card-row"><span>Desperdicio</span><strong>{item.desperdicio || 0}</strong></div>
-                </div>
-              ))}
-            </div>
-          ) : reportLoading ? (
+          {reportLoading ? (
             <div className="loading-container" style={{ padding: '30px 20px' }}>
               <div className="spinner" style={{ width: 24, height: 24 }} />
               <div className="loading-text">Generando reporte...</div>
             </div>
+          ) : reportData.length > 0 ? (
+            <div className="report-list">
+              {reportData.map((group) => (
+                <div key={`selladora-${group.selladora}`} className="report-group">
+                  <div className="report-group-header">Selladora {group.selladora}</div>
+                  <div className="report-group-cards">
+                    {group.reportes.map((r, idx) => (
+                      <div key={`${r.referencia}-${idx}`} className="report-card">
+                        <div className="report-card-title">{r.referencia || 'Sin referencia'}</div>
+                        <div className="report-card-row"><span>Operario</span><strong>{r.operario || 'Desconocido'}</strong></div>
+                        <div className="report-card-row"><span>N° Rollo</span><strong>{r.numeroRollo || '—'}</strong></div>
+                        <div className="report-card-row"><span>Hora inicio</span><strong>{r.horaInicio ? new Date(r.horaInicio).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }) : '—'}</strong></div>
+                        <div className="report-card-row"><span>Hora fin</span><strong>{r.horaFin ? new Date(r.horaFin).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }) : '—'}</strong></div>
+                        <div className="report-card-row"><span>Cantidad producida</span><strong>{r.cantidadProducida || 0}</strong></div>
+                        <div className="report-card-row"><span>Desperdicio</span><strong>{r.desperdicio || 0} kg</strong></div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : reportSearched ? (
+            <div className="empty-state">No se encontraron reportes para esta fecha.</div>
           ) : (
             <div className="empty-state">Haz clic en "Generar reporte" para ver resultados.</div>
           )}

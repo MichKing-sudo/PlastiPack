@@ -128,3 +128,14 @@ npm run dev           # ▶️ Inicia dev server en :5173
 - 📅 **Plazo mínimo:** La fecha de entrega debe ser al menos 15 días después de la creación.
 - 📊 **Estado general:** Se calcula automáticamente según el estado de cada línea del pedido.
 - ♻️ **Eliminación suave:** Las referencias se desactivan en lugar de eliminarse.
+
+---
+
+## 👨‍💻 Equipo de desarrollo
+
+| Nombre |
+|--------|
+| **Santiago Andrés García Guerrero** |
+| **Eder Santiago Roa Monroy** |
+| **Jhon Michael Montes Afanador** |
+| **Diana Marcela Lozano Diaz** |
